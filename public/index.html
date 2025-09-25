@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Industrial Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { margin:0; padding:0; height:100%; font-family: ui-sans-serif, system-ui, Arial; }
+    header { padding: 10px 14px; background: #0f172a; color: #e2e8f0; font-weight: 700; }
+    .wrap { display: grid; grid-template-columns: 280px 1fr; height: calc(100% - 52px); }
+    aside { border-right: 1px solid #e2e8f0; overflow:auto; }
+    main { padding: 12px; overflow:auto; }
+    .st { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; cursor: pointer; }
+    .st:hover { background: #f1f5f9; }
+    .st.active { background: #e2e8f0; font-weight: 600; }
+    .muted { color:#64748b; }
+    .row { display:flex; gap:10px; align-items:center; }
+    .card { border:1px solid #e5e7eb; border-radius:10px; padding:12px; margin:10px 0; }
+    table { border-collapse: collapse; width:100%; }
+    th, td { border-bottom:1px solid #e5e7eb; padding:8px; text-align:left; font-size:14px; }
+    code { background:#f1f5f9; padding:2px 6px; border-radius:6px; }
+    .tab { display:inline-block; padding:6px 10px; margin-right:6px; border:1px solid #e5e7eb; border-radius:8px; cursor:pointer; }
+    .tab.active { background:#e2e8f0; }
+  </style>
+</head>
+<body>
+  <header>Factory Digital Twin — Minimal Dashboard (Express + Socket.IO)</header>
+  <div class="wrap">
+    <aside id="stations"></aside>
+    <main>
+      <div class="row">
+        <div>Selected station: <strong id="selName" class="muted">-</strong></div>
+        <div class="muted">(<code id="selId">-</code>)</div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content: space-between;">
+          <div>
+            <span class="tab active" id="tab-ws">WebSocket</span>
+            <span class="tab" id="tab-sse">SSE</span>
+          </div>
+          <code id="liveInfo">-</code>
+        </div>
+        <div id="live" class="row" style="gap:20px; margin-top:8px;">
+          <div>Status: <strong id="status">-</strong></div>
+          <div>Scheduled: <strong id="scheduled">-</strong></div>
+          <div>Packed FG: <strong id="packed">-</strong></div>
+          <div>Pass: <strong id="pass">-</strong></div>
+          <div>Fail: <strong id="fail">-</strong></div>
+          <div>Suspect: <strong id="suspect">-</strong></div>
+          <div class="muted">ts: <code id="ts">-</code></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content: space-between;">
+          <div>Devices</div>
+          <div>
+            <label class="muted">Filter type:</label>
+            <input id="flt" placeholder="e.g. Robot, PLC, Vision Camera" />
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Vendor</th><th>Model</th></tr></thead>
+        <tbody id="devBody"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Socket.IO client served by server at /socket.io/socket.io.js -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const qs = (s) => document.querySelector(s);
+    const stationsEl = qs("#stations");
+    const devBody = qs("#devBody");
+    const selName = qs("#selName");
+    const selId = qs("#selId");
+    const statusEl = qs("#status");
+    const scheduledEl = qs("#scheduled");
+    const packedEl = qs("#packed");
+    const passEl = qs("#pass");
+    const failEl = qs("#fail");
+    const suspectEl = qs("#suspect");
+    const tsEl = qs("#ts");
+    const flt = qs("#flt");
+    const liveInfo = qs("#liveInfo");
+    const tabWs = qs("#tab-ws");
+    const tabSse = qs("#tab-sse");
+
+    let currentStation = null;
+    let currentSSE = null;
+    let currentSock = null;
+    let devicesCache = [];
+
+    function setActiveStation(id) {
+      [...stationsEl.querySelectorAll(".st")].forEach(x => x.classList.toggle("active", x.dataset.id === id));
+    }
+    function setActiveTab(which) {
+      tabWs.classList.toggle("active", which === "ws");
+      tabSse.classList.toggle("active", which === "sse");
+    }
+
+    async function loadStations() {
+      const res = await fetch("/api/stations");
+      const data = await res.json();
+      stationsEl.innerHTML = "";
+      data.forEach(st => {
+        const div = document.createElement("div");
+        div.className = "st";
+        div.dataset.id = st.id;
+        div.textContent = `${st.name} (${st.id})`;
+        div.onclick = () => selectStation(st);
+        stationsEl.appendChild(div);
+      });
+      if (data.length) selectStation(data[0]);
+    }
+
+    async function selectStation(st) {
+      currentStation = st;
+      setActiveStation(st.id);
+      selName.textContent = st.name;
+      selId.textContent = st.id;
+
+      const res = await fetch(`/api/stations/${encodeURIComponent(st.id)}/devices`);
+      devicesCache = await res.json();
+      renderDevices();
+
+      // default: WebSocket
+      setActiveTab("ws");
+      startWS(st.id);
+    }
+
+    function startWS(id) {
+      stopLive();
+      currentSock = io("/", { transports: ["websocket"], query: { stationId: id } });
+      currentSock.emit("subscribe-station", { stationId: id });
+      liveInfo.textContent = `WS room: station:${id}`;
+      currentSock.on("telemetry", (e) => applyLive(e));
+      currentSock.on("connect_error", () => { statusEl.textContent = "WS ERROR"; });
+    }
+
+    function startSSE(id) {
+      stopLive();
+      const url = `/api/stream/station/${encodeURIComponent(id)}`;
+      liveInfo.textContent = `SSE ${url}`;
+      currentSSE = new EventSource(url);
+      currentSSE.onmessage = (ev) => { try { applyLive(JSON.parse(ev.data)); } catch {} };
+      currentSSE.onerror = () => { statusEl.textContent = "SSE ERROR"; };
+    }
+
+    function stopLive() {
+      if (currentSock) { currentSock.disconnect(); currentSock = null; }
+      if (currentSSE) { currentSSE.close(); currentSSE = null; }
+    }
+
+    function applyLive(e) {
+      statusEl.textContent = e.status ?? "-";
+      tsEl.textContent = e.ts ?? "-";
+      const m = e.metrics || {};
+      scheduledEl.textContent = m.scheduled ?? "-";
+      packedEl.textContent = m.packedFg ?? "-";
+      passEl.textContent = m.pass ?? "-";
+      failEl.textContent = m.fail ?? "-";
+      suspectEl.textContent = m.suspect ?? "-";
+    }
+
+    function renderDevices() {
+      const f = (flt.value || "").trim().toLowerCase();
+      const list = f ? devicesCache.filter(d => (d.type||"").toLowerCase().includes(f)) : devicesCache;
+      devBody.innerHTML = "";
+      list.forEach(d => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><code>${d.id}</code></td>
+          <td>${d.name || "-"}</td>
+          <td>${d.type || "-"}</td>
+          <td>${d.vendor || "-"}</td>
+          <td>${d.model || "-"}</td>
+        `;
+        devBody.appendChild(tr);
+      });
+    }
+
+    tabWs.onclick = () => { if (currentStation) { setActiveTab("ws"); startWS(currentStation.id); } };
+    tabSse.onclick = () => { if (currentStation) { setActiveTab("sse"); startSSE(currentStation.id); } };
+
+    flt.addEventListener("input", renderDevices);
+    loadStations();
+  </script>
+</body>
+</html>

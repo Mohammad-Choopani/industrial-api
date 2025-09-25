@@ -1,0 +1,42 @@
+﻿# --- Node / Monorepo ---
+node_modules/
+dist/
+build/
+.cache/
+.tmp/
+.npm/
+.pnp.*
+coverage/
+
+# --- Env / Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --- Prisma ---
+.prisma/**
+!.prisma/schema.prisma
+
+# --- Misc ---
+*.local
+*.sqlite
+*.sqlite-journal
+
+# --- Frontend build outputs (Vite/React) ---
+web/node_modules/
+web/dist/
+web/.vite/

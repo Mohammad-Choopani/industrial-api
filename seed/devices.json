@@ -1,0 +1,148 @@
+[
+  { "id": "DT-FRT-PLC", "station_id": "DT-FRT", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:dtfrt_plc"] },
+  { "id": "DT-FRT-HMI", "station_id": "DT-FRT", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:dtfrt_hmi"] },
+  { "id": "DT-FRT-CONV-IN", "station_id": "DT-FRT", "name": "Infeed Conveyor", "type": "Conveyor", "vendor": null, "model": null, "tags": ["mesh:dtfrt_conv_in"] },
+  { "id": "DT-FRT-FIX-A", "station_id": "DT-FRT", "name": "Fixture A", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:dtfrt_fix_a"] },
+
+  { "id": "DT-RR-PLC", "station_id": "DT-RR", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:dtrr_plc"] },
+  { "id": "DT-RR-HMI", "station_id": "DT-RR", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:dtrr_hmi"] },
+  { "id": "DT-RR-CONV-OUT", "station_id": "DT-RR", "name": "Outfeed Conveyor", "type": "Conveyor", "vendor": null, "model": null, "tags": ["mesh:dtrr_conv_out"] },
+  { "id": "DT-RR-SCANNER", "station_id": "DT-RR", "name": "Barcode Scanner", "type": "Scanner", "vendor": null, "model": null, "tags": ["mesh:dtrr_scanner"] },
+
+  { "id": "C1UL-WF-PLC", "station_id": "C1UL-WF", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1ulwf_plc"] },
+  { "id": "C1UL-WF-HMI", "station_id": "C1UL-WF", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1ulwf_hmi"] },
+  { "id": "C1UL-WF-FIX", "station_id": "C1UL-WF", "name": "Work Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:c1ulwf_fix"] },
+  { "id": "C1UL-WF-CLAMP-01", "station_id": "C1UL-WF", "name": "Clamp 01", "type": "Clamp", "vendor": null, "model": null, "tags": ["mesh:c1ulwf_clamp01"] },
+
+  { "id": "C1UL-DP-PLC", "station_id": "C1UL-DP", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1uldp_plc"] },
+  { "id": "C1UL-DP-HMI", "station_id": "C1UL-DP", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1uldp_hmi"] },
+  { "id": "C1UL-DP-PRESS", "station_id": "C1UL-DP", "name": "Drill/Press", "type": "Actuator", "vendor": null, "model": null, "tags": ["mesh:c1uldp_press"] },
+  { "id": "C1UL-DP-SAF-LC", "station_id": "C1UL-DP", "name": "Safety Light Curtain", "type": "Safety", "vendor": null, "model": null, "tags": ["mesh:c1uldp_lightcurtain"] },
+
+  { "id": "BT1XX-RH-W-PLC", "station_id": "BT1XX-RH-W", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:bt1xxrhw_plc"] },
+  { "id": "BT1XX-RH-W-HMI", "station_id": "BT1XX-RH-W", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:bt1xxrhw_hmi"] },
+  { "id": "BT1XX-RH-W-WELDER", "station_id": "BT1XX-RH-W", "name": "Welder", "type": "Welder", "vendor": null, "model": null, "tags": ["mesh:bt1xxrhw_welder"] },
+  { "id": "BT1XX-RH-W-FIX", "station_id": "BT1XX-RH-W", "name": "Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:bt1xxrhw_fix"] },
+
+  { "id": "BT1XX-RKRS-H-PLC", "station_id": "BT1XX-RKRS-H", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:bt1xxrkrs_plc"] },
+  { "id": "BT1XX-RKRS-H-HMI", "station_id": "BT1XX-RKRS-H", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:bt1xxrkrs_hmi"] },
+  { "id": "BT1XX-RKRS-H-FIX", "station_id": "BT1XX-RKRS-H", "name": "RKR Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:bt1xxrkrs_fix"] },
+  { "id": "BT1XX-RKRS-H-ROBOT", "station_id": "BT1XX-RKRS-H", "name": "Robot", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:bt1xxrkrs_robot"] },
+
+  { "id": "BT1XX-BSM-PLC", "station_id": "BT1XX-BSM", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:bt1xxbsm_plc"] },
+  { "id": "BT1XX-BSM-HMI", "station_id": "BT1XX-BSM", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:bt1xxbsm_hmi"] },
+  { "id": "BT1XX-BSM-CAM", "station_id": "BT1XX-BSM", "name": "BSM Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:bt1xxbsm_cam"] },
+  { "id": "BT1XX-BSM-FIX", "station_id": "BT1XX-BSM", "name": "Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:bt1xxbsm_fix"] },
+
+  { "id": "C1YX-RKRS-RH-PLC", "station_id": "C1YX-RKRS-RH", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1yxrkrs_plc"] },
+  { "id": "C1YX-RKRS-RH-HMI", "station_id": "C1YX-RKRS-RH", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1yxrkrs_hmi"] },
+  { "id": "C1YX-RKRS-RH-CAM", "station_id": "C1YX-RKRS-RH", "name": "RH Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:c1yxrkrs_cam_rh"] },
+  { "id": "C1YX-RKRS-RH-LOC-RH1", "station_id": "C1YX-RKRS-RH", "name": "RH Locator #1", "type": "Locator", "vendor": null, "model": null, "tags": ["mesh:c1yxrkrs_loc_rh1"] },
+
+  { "id": "C1YX-DP-LH-PLC", "station_id": "C1YX-DP-LH", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1yxdplh_plc"] },
+  { "id": "C1YX-DP-LH-HMI", "station_id": "C1YX-DP-LH", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1yxdplh_hmi"] },
+  { "id": "C1YX-DP-LH-CAM", "station_id": "C1YX-DP-LH", "name": "LH Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:c1yxdplh_cam_lh"] },
+  { "id": "C1YX-DP-LH-LOC-LH1", "station_id": "C1YX-DP-LH", "name": "LH Locator #1", "type": "Locator", "vendor": null, "model": null, "tags": ["mesh:c1yxdplh_loc_lh1"] },
+
+  { "id": "C1YX-MIC-PLC", "station_id": "C1YX-MIC", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1yxmic_plc"] },
+  { "id": "C1YX-MIC-HMI", "station_id": "C1YX-MIC", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1yxmic_hmi"] },
+  { "id": "C1YX-MIC-CAM", "station_id": "C1YX-MIC", "name": "Vision Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:c1yxmic_cam"] },
+  { "id": "C1YX-MIC-FIX", "station_id": "C1YX-MIC", "name": "Bracket Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:c1yxmic_fix"] },
+
+  { "id": "C1YX-MIC-BRACKET-PLC", "station_id": "C1YX-MIC-BRACKET", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1yxmicbr_plc"] },
+  { "id": "C1YX-MIC-BRACKET-HMI", "station_id": "C1YX-MIC-BRACKET", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1yxmicbr_hmi"] },
+  { "id": "C1YX-MIC-BRACKET-FEEDER", "station_id": "C1YX-MIC-BRACKET", "name": "Bracket Feeder", "type": "Feeder", "vendor": null, "model": null, "tags": ["mesh:c1yxmicbr_feeder"] },
+  { "id": "C1YX-MIC-BRACKET-CAM", "station_id": "C1YX-MIC-BRACKET", "name": "Vision Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:c1yxmicbr_cam"] },
+
+  { "id": "C1YX-LDM-CPOD-PLC", "station_id": "C1YX-LDM-CPOD", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1yxlcmcpod_plc"] },
+  { "id": "C1YX-LDM-CPOD-HMI", "station_id": "C1YX-LDM-CPOD", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1yxlcmcpod_hmi"] },
+  { "id": "C1YX-LDM-CPOD-FEEDER", "station_id": "C1YX-LDM-CPOD", "name": "CPOD Feeder", "type": "Feeder", "vendor": null, "model": null, "tags": ["mesh:c1yxlcmcpod_feeder"] },
+  { "id": "C1YX-LDM-CPOD-LOC", "station_id": "C1YX-LDM-CPOD", "name": "Locator", "type": "Locator", "vendor": null, "model": null, "tags": ["mesh:c1yxlcmcpod_locator"] },
+
+  { "id": "C1YX-LDM-PLC", "station_id": "C1YX-LDM", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:c1yxlcm_plc"] },
+  { "id": "C1YX-LDM-HMI", "station_id": "C1YX-LDM", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:c1yxlcm_hmi"] },
+  { "id": "C1YX-LDM-FIX", "station_id": "C1YX-LDM", "name": "LDM Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:c1yxlcm_fix"] },
+  { "id": "C1YX-LDM-LOC", "station_id": "C1YX-LDM", "name": "Locator", "type": "Locator", "vendor": null, "model": null, "tags": ["mesh:c1yxlcm_locator"] },
+
+  { "id": "PAINTED-WF-PLC", "station_id": "PAINTED-WF", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:paintwf_plc"] },
+  { "id": "PAINTED-WF-HMI", "station_id": "PAINTED-WF", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:paintwf_hmi"] },
+  { "id": "PAINTED-WF-RACK", "station_id": "PAINTED-WF", "name": "Paint Rack", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:paintwf_rack"] },
+  { "id": "PAINTED-WF-SCANNER", "station_id": "PAINTED-WF", "name": "Barcode Scanner", "type": "Scanner", "vendor": null, "model": null, "tags": ["mesh:paintwf_scanner"] },
+
+  { "id": "PHEV-PLC", "station_id": "PHEV", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:phev_plc"] },
+  { "id": "PHEV-HMI", "station_id": "PHEV", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:phev_hmi"] },
+  { "id": "PHEV-FIX", "station_id": "PHEV", "name": "Assembly Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:phev_fix"] },
+  { "id": "PHEV-TESTER", "station_id": "PHEV", "name": "Electrical Tester", "type": "Tester", "vendor": null, "model": null, "tags": ["mesh:phev_tester"] },
+
+  { "id": "MDX-LPG-PLC", "station_id": "MDX-LPG", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:mdxlpg_plc"] },
+  { "id": "MDX-LPG-HMI", "station_id": "MDX-LPG", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:mdxlpg_hmi"] },
+  { "id": "MDX-LPG-FIX", "station_id": "MDX-LPG", "name": "LPG Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:mdxlpg_fix"] },
+  { "id": "MDX-LPG-ROBOT", "station_id": "MDX-LPG", "name": "Robot", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:mdxlpg_robot"] },
+
+  { "id": "MDX-SKID-PLC", "station_id": "MDX-SKID", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:mdxskid_plc"] },
+  { "id": "MDX-SKID-HMI", "station_id": "MDX-SKID", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:mdxskid_hmi"] },
+  { "id": "MDX-SKID-CONV", "station_id": "MDX-SKID", "name": "Skid Conveyor", "type": "Conveyor", "vendor": null, "model": null, "tags": ["mesh:mdxskid_conv"] },
+  { "id": "MDX-SKID-PRINTER", "station_id": "MDX-SKID", "name": "Label Printer", "type": "Printer", "vendor": null, "model": null, "tags": ["mesh:mdxskid_printer"] },
+
+  { "id": "COWL-PLC", "station_id": "COWL", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:cowl_plc"] },
+  { "id": "COWL-HMI", "station_id": "COWL", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:cowl_hmi"] },
+  { "id": "COWL-FIX", "station_id": "COWL", "name": "Cowl Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:cowl_fix"] },
+  { "id": "COWL-ROBOT", "station_id": "COWL", "name": "Robot", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:cowl_robot"] },
+
+  { "id": "END-CAPS-LH-PLC", "station_id": "END-CAPS-LH", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:endcaplh_plc"] },
+  { "id": "END-CAPS-LH-HMI", "station_id": "END-CAPS-LH", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:endcaplh_hmi"] },
+  { "id": "END-CAPS-LH-CAM", "station_id": "END-CAPS-LH", "name": "LH Vision Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:endcaplh_cam"] },
+  { "id": "END-CAPS-LH-LOC", "station_id": "END-CAPS-LH", "name": "LH Locator", "type": "Locator", "vendor": null, "model": null, "tags": ["mesh:endcaplh_loc"] },
+
+  { "id": "END-CAPS-RH-PLC", "station_id": "END-CAPS-RH", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:endcaprh_plc"] },
+  { "id": "END-CAPS-RH-HMI", "station_id": "END-CAPS-RH", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:endcaprh_hmi"] },
+  { "id": "END-CAPS-RH-CAM", "station_id": "END-CAPS-RH", "name": "RH Vision Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:endcaprh_cam"] },
+  { "id": "END-CAPS-RH-LOC", "station_id": "END-CAPS-RH", "name": "RH Locator", "type": "Locator", "vendor": null, "model": null, "tags": ["mesh:endcaprh_loc"] },
+
+  { "id": "WS-FRT-PLC", "station_id": "WS-FRT", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:wsfrt_plc"] },
+  { "id": "WS-FRT-HMI", "station_id": "WS-FRT", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:wsfrt_hmi"] },
+  { "id": "WS-FRT-SCANNER", "station_id": "WS-FRT", "name": "Barcode Scanner", "type": "Scanner", "vendor": null, "model": null, "tags": ["mesh:wsfrt_scanner"] },
+  { "id": "WS-FRT-HANDLER", "station_id": "WS-FRT", "name": "Glass Handler", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:wsfrt_handler"] },
+
+  { "id": "HEAD-LAMPS-PLC", "station_id": "HEAD-LAMPS", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:headlamps_plc"] },
+  { "id": "HEAD-LAMPS-HMI", "station_id": "HEAD-LAMPS", "name": "Station HMI", "type": "HMI Panel", "vendor": "Omron", "model": null, "tags": ["mesh:headlamps_hmi"] },
+  { "id": "HEAD-LAMPS-TESTER", "station_id": "HEAD-LAMPS", "name": "Lamp Tester", "type": "Tester", "vendor": null, "model": null, "tags": ["mesh:headlamps_tester"] },
+  { "id": "HEAD-LAMPS-PRINTER", "station_id": "HEAD-LAMPS", "name": "Label Printer", "type": "Printer", "vendor": null, "model": null, "tags": ["mesh:headlamps_printer"] },
+
+  { "id": "WL-75-PLC", "station_id": "WL-75", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:wl75_plc"] },
+  { "id": "WL-75-HMI", "station_id": "WL-75", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:wl75_hmi"] },
+  { "id": "WL-75-WELDER", "station_id": "WL-75", "name": "Welder 75", "type": "Welder", "vendor": null, "model": null, "tags": ["mesh:wl75_welder"] },
+  { "id": "WL-75-SAF-LC", "station_id": "WL-75", "name": "Safety Light Curtain", "type": "Safety", "vendor": null, "model": null, "tags": ["mesh:wl75_lightcurtain"] },
+
+  { "id": "GRILL-FHEV-PLC", "station_id": "GRILL-FHEV", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:grillfhev_plc"] },
+  { "id": "GRILL-FHEV-HMI", "station_id": "GRILL-FHEV", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:grillfhev_hmi"] },
+  { "id": "GRILL-FHEV-ROBOT", "station_id": "GRILL-FHEV", "name": "Robot", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:grillfhev_robot"] },
+  { "id": "GRILL-FHEV-CAM", "station_id": "GRILL-FHEV", "name": "Vision Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:grillfhev_cam"] },
+
+  { "id": "GRILLE-BASE-PLC", "station_id": "GRILLE-BASE", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:grillbase_plc"] },
+  { "id": "GRILLE-BASE-HMI", "station_id": "GRILLE-BASE", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:grillbase_hmi"] },
+  { "id": "GRILLE-BASE-FIX", "station_id": "GRILLE-BASE", "name": "Base Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:grillbase_fix"] },
+  { "id": "GRILLE-BASE-CAM", "station_id": "GRILLE-BASE", "name": "Vision Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:grillbase_cam"] },
+
+  { "id": "23-SPOILER-1-PLC", "station_id": "23-SPOILER-1", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:23sp1_plc"] },
+  { "id": "23-SPOILER-1-HMI", "station_id": "23-SPOILER-1", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:23sp1_hmi"] },
+  { "id": "23-SPOILER-1-ROBOT-100", "station_id": "23-SPOILER-1", "name": "Robot 100", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:23sp1_robot100"] },
+  { "id": "23-SPOILER-1-CAM-LH", "station_id": "23-SPOILER-1", "name": "LH Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:23sp1_cam_lh"] },
+  { "id": "23-SPOILER-1-CAM-RH", "station_id": "23-SPOILER-1", "name": "RH Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:23sp1_cam_rh"] },
+
+  { "id": "23-SPOILER-2-PLC", "station_id": "23-SPOILER-2", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:23sp2_plc"] },
+  { "id": "23-SPOILER-2-HMI", "station_id": "23-SPOILER-2", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:23sp2_hmi"] },
+  { "id": "23-SPOILER-2-ROBOT-101", "station_id": "23-SPOILER-2", "name": "Robot 101", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:23sp2_robot101"] },
+  { "id": "23-SPOILER-2-CAM-LH", "station_id": "23-SPOILER-2", "name": "LH Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:23sp2_cam_lh"] },
+  { "id": "23-SPOILER-2-CAM-RH", "station_id": "23-SPOILER-2", "name": "RH Camera", "type": "Vision Camera", "vendor": null, "model": null, "tags": ["mesh:23sp2_cam_rh"] },
+
+  { "id": "A2LL-RKR-PLC", "station_id": "A2LL-RKR", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:a2llrkr_plc"] },
+  { "id": "A2LL-RKR-HMI", "station_id": "A2LL-RKR", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:a2llrkr_hmi"] },
+  { "id": "A2LL-RKR-FIX", "station_id": "A2LL-RKR", "name": "RKR Fixture", "type": "Fixture", "vendor": null, "model": null, "tags": ["mesh:a2llrkr_fix"] },
+  { "id": "A2LL-RKR-ROBOT", "station_id": "A2LL-RKR", "name": "Robot", "type": "Robot", "vendor": null, "model": null, "tags": ["mesh:a2llrkr_robot"] },
+
+  { "id": "A-BRACKET-PLC", "station_id": "A-BRACKET", "name": "Station PLC", "type": "PLC", "vendor": null, "model": null, "tags": ["mesh:abracket_plc"] },
+  { "id": "A-BRACKET-HMI", "station_id": "A-BRACKET", "name": "Station HMI", "type": "HMI Panel", "vendor": null, "model": null, "tags": ["mesh:abracket_hmi"] },
+  { "id": "A-BRACKET-PRESS", "station_id": "A-BRACKET", "name": "Bracket Press", "type": "Actuator", "vendor": null, "model": null, "tags": ["mesh:abracket_press"] },
+  { "id": "A-BRACKET-FEEDER", "station_id": "A-BRACKET", "name": "Bracket Feeder", "type": "Feeder", "vendor": null, "model": null, "tags": ["mesh:abracket_feeder"] }
+]

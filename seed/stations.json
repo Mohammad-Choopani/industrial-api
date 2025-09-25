@@ -1,0 +1,42 @@
+[
+  { "id": "DT-FRT",           "name": "DT FRT",                     "line": "DT",        "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "DT-RR",            "name": "DT RR",                      "line": "DT",        "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "C1UL-WF",          "name": "C1UL WF",                    "line": "C1UL",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "C1UL-DP",          "name": "C1UL DP",                    "line": "C1UL",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "BT1XX-RH-W",       "name": "BT1XX RH W",                 "line": "BT1XX",     "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "BT1XX-RKRS-H",     "name": "BT1XX RKRS H",               "line": "BT1XX",     "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "BT1XX-BSM",        "name": "BT1XX BSM",                  "line": "BT1XX",     "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "C1YX-RKRS-RH",     "name": "C1YX RKRS RH",               "line": "C1YX",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "C1YX-DP-LH",       "name": "C1YX DP LH",                 "line": "C1YX",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "C1YX-MIC",         "name": "C1YX MIC",                   "line": "C1YX",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "C1YX-MIC-BRACKET", "name": "C1YX MIC BRACKET",           "line": "C1YX",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "C1YX-LDM-CPOD",    "name": "C1YX LDM CPOD",              "line": "C1YX",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "C1YX-LDM",         "name": "C1YX LDM",                   "line": "C1YX",      "pod": "G/H", "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "PAINTED-WF",       "name": "PAINTED WF",                 "line": "Paint",     "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "PHEV",             "name": "PHEV",                       "line": "PHEV",      "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "MDX-LPG",          "name": "MDX LPG",                    "line": "MDX",       "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "MDX-SKID",         "name": "MDX SKID",                   "line": "MDX",       "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "COWL",             "name": "COWL",                       "line": "COWL",      "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "END-CAPS-LH",      "name": "END CAPS LH",                "line": "EndCaps",   "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "END-CAPS-RH",      "name": "END CAPS RH",                "line": "EndCaps",   "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "WS-FRT",           "name": "WS FRT",                     "line": "WS",        "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "HEAD-LAMPS",       "name": "HEAD LAMPS",                 "line": "Lamps",     "pod": null,  "area": "Windsor Plant 3", "hmi_brand": "Omron","builder": null,      "screen_url": null },
+
+  { "id": "WL-75",            "name": "WL 75",                      "line": "WL75",      "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "GRILL-FHEV",       "name": "GRILL FHEV",                 "line": "Grille",    "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": "Trillium","screen_url": null },
+  { "id": "GRILLE-BASE",      "name": "GRILLE BASE",                "line": "Grille",    "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": "Trillium","screen_url": null },
+
+  { "id": "23-SPOILER-1",     "name": "23 SPOILER (Team 1)",        "line": "23 Spoiler","pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "23-SPOILER-2",     "name": "23 SPOILER (Team 2)",        "line": "23 Spoiler","pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+
+  { "id": "A2LL-RKR",         "name": "A2LL RKR",                   "line": "A2LL",      "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null },
+  { "id": "A-BRACKET",        "name": "A BRACKET",                  "line": "Bracket",   "pod": null,  "area": "Windsor Plant 3", "hmi_brand": null,   "builder": null,      "screen_url": null }
+]

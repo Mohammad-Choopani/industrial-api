@@ -1,0 +1,101 @@
+:root {
+  --bg: #0f1115;
+  --panel: #151822;
+  --text: #e6e6e6;
+  --muted: #9aa0a6;
+  --accent: #4ea1ff;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --err: #ef4444;
+  --card: #1b2030;
+  --border: #23283b;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app__header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.app__header h1 { margin: 0 0 6px 0; font-size: 20px; }
+.app__header p { margin: 0; color: var(--muted); }
+
+.app__main {
+  display: grid;
+  grid-template-columns: 320px 1fr 1fr;
+  gap: 14px;
+  padding: 14px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 280px;
+}
+
+h2 { margin: 6px 0 12px; font-size: 16px; }
+
+.list {
+  display: grid;
+  gap: 6px;
+  max-height: calc(100vh - 210px);
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); }
+.btn--primary { border-color: var(--accent); }
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.kv { display: grid; grid-template-columns: 120px 1fr; gap: 6px; }
+.kv div { display: contents; }
+.k { color: var(--muted); }
+.v { color: var(--text); }
+
+code.inline {
+  padding: 2px 6px;
+  background: #0c0f16;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th, .table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+}
+.table th { color: var(--muted); font-weight: 500; }

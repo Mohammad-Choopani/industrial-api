@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Device {
+  id         String      @id
+  station_id String
+  name       String?
+  type       String
+  vendor     String?
+  model      String?
+  tags       String[]
+  Station    Station     @relation(fields: [station_id], references: [id], onDelete: Cascade)
+  Telemetry  Telemetry[]
+
+  @@index([station_id])
+  @@index([type])
+}
+
+model Station {
+  id         String      @id
+  name       String
+  line       String
+  pod        String?
+  area       String?
+  hmi_brand  String?
+  builder    String?
+  screen_url String?
+  Device     Device[]
+  Telemetry  Telemetry[]
+}
+
+model Telemetry {
+  id        BigInt   @default(autoincrement())
+  time      DateTime @db.Timestamptz(6)
+  stationId String
+  deviceId  String?
+  k         String
+  v         Float?
+  Device    Device?  @relation(fields: [deviceId], references: [id])
+  Station   Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+  @@id([time, id])
+  @@unique([stationId, time], map: "Telemetry_station_time_uq")
+  @@index([deviceId, time(sort: Desc)])
+  @@index([stationId, time(sort: Desc)])
+  @@index([deviceId, time(sort: Desc)], map: "Telemetry_device_time_idx")
+  @@index([stationId, time(sort: Desc)], map: "Telemetry_station_time_idx")
+  @@index([time(sort: Desc)])
+}

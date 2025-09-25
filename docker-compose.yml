@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  industrial_db:
+    image: timescale/timescaledb:2.14.2-pg16
+    container_name: industrial_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: factory
+    ports:
+      - "5432:5432"
+    volumes:
+      - industrial_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d factory"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  industrial_adminer:
+    image: adminer:4.8.1
+    container_name: industrial_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      industrial_db:
+        condition: service_healthy
+
+volumes:
+  industrial_pgdata:

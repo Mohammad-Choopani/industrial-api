@@ -12,7 +12,9 @@
     "start": "node dist/server.js",
     "prisma:push": "prisma db push",
     "prisma:generate": "prisma generate",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "start:dev": "powershell -ExecutionPolicy Bypass -File .\\\\start-dev.ps1",
+    "stop:dev": "powershell -ExecutionPolicy Bypass -File .\\\\stop-dev.ps1"
   },
   "dependencies": {
     "@prisma/client": "^6.16.1",

@@ -1,5 +1,5 @@
 // web/src/components/Live.tsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,13 +11,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_BASE =
+  (import.meta as any).env?.VITE_API_BASE ||
+  (import.meta as any).env?.VITE_API_URL ||
+  "http://localhost:4000";
 
-// Smoothed chart with fixed sampling, EMA, and status hysteresis.
 type TelemetryEvent = {
   stationId?: string;
-  ts?: string;
-  status?: "RUNNING" | "IDLE" | "DOWN";
+  ts?: string; // ISO timestamp from server
+  status?: "RUNNING" | "IDLE" | "DOWN" | string;
   speed?: number;
   count?: number;
   pass?: number;
@@ -28,21 +30,19 @@ type TelemetryEvent = {
 };
 
 type Props = {
-  stationId?: string;
+  stationId: string;
   maxPoints?: number;
-  sampleEveryMs?: number; // fixed chart sampling interval
-  emaAlpha?: number; // 0..1 (lower = smoother)
-  statusStableReads?: number; // consecutive reads required to flip status
+  throttleMs?: number; // UI update throttle
+  speedEmaAlpha?: number; // 0..1 (lower = smoother)
 };
 
 export default function Live({
-  stationId = "WINDSHIELD",
+  stationId,
   maxPoints = 300,
-  sampleEveryMs = 1000,
-  emaAlpha = 0.3,
-  statusStableReads = 3,
+  throttleMs = 250,
+  speedEmaAlpha = 0.3,
 }: Props) {
-  const [points, setPoints] = useState<Array<any>>([]);
+  const [points, setPoints] = useState<any[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [paused, setPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +50,18 @@ export default function Live({
 
   const esRef = useRef<EventSource | null>(null);
 
-  // Raw accumulator of last incoming event
-  const lastRawRef = useRef<Required<Pick<TelemetryEvent, "speed" | "count" | "pass" | "fail" | "suspect" | "packedFg" | "status">> & { ts: number }>({
-    ts: Date.now(),
+  // last snapshot from server (authoritative for counters)
+  const lastSnapRef = useRef<{
+    ts: string;
+    status: string;
+    speed: number; // EMA-smoothed
+    count: number;
+    pass: number;
+    fail: number;
+    suspect: number;
+    packedFg: number;
+  }>({
+    ts: "",
     status: "IDLE",
     speed: 0,
     count: 0,
@@ -62,175 +71,148 @@ export default function Live({
     packedFg: 0,
   });
 
-  // EMA state
-  const emaRef = useRef({
-    speed: 0,
-    count: 0,
-    pass: 0,
-    fail: 0,
-    suspect: 0,
-    packedFg: 0,
-  });
+  // dedup + throttle
+  const lastTsRef = useRef<string>("");
+  const throttleTimerRef = useRef<number | null>(null);
+  const pendingRef = useRef<typeof lastSnapRef.current | null>(null);
 
-  // Hysteresis for status
-  const statusRef = useRef<{ current: "RUNNING" | "IDLE" | "DOWN"; candidate: string | null; streak: number }>({
-    current: "IDLE",
-    candidate: null,
-    streak: 0,
-  });
-
-  const streamUrl = useMemo(
-    () => `${API_BASE}/api/stream/station/${encodeURIComponent(stationId)}`,
-    [stationId]
-  );
-
-  function clampNum(n: any, fallback = 0) {
-    const v = Number(n);
-    return Number.isFinite(v) ? v : fallback;
-  }
-
-  function updateRaw(payload: TelemetryEvent) {
-    const now = payload.ts ? new Date(payload.ts).getTime() : Date.now();
-    const r = lastRawRef.current;
-
-    r.ts = now;
-    r.speed = clampNum(payload.speed, r.speed);
-    r.count = clampNum(payload.count, r.count);
-
-    // If server does not provide cumulative counters, gently increment to look natural
-    r.pass = payload.pass !== undefined ? clampNum(payload.pass, r.pass) : Math.max(0, r.pass + (Math.random() < 0.6 ? 1 : 0));
-    r.fail = payload.fail !== undefined ? clampNum(payload.fail, r.fail) : Math.max(0, r.fail + (Math.random() < 0.05 ? 1 : 0));
-    r.suspect = payload.suspect !== undefined ? clampNum(payload.suspect, r.suspect) : Math.max(0, r.suspect + (Math.random() < 0.08 ? 1 : 0));
-    r.packedFg = payload.packedFg !== undefined ? clampNum(payload.packedFg, r.packedFg) : Math.max(0, r.packedFg + (Math.random() < 0.12 ? 1 : 0));
-
-    // Status hysteresis
-    const incoming = (payload.status as any) ?? r.status ?? "IDLE";
-    const s = statusRef.current;
-    if (incoming !== s.current) {
-      if (s.candidate === incoming) {
-        s.streak += 1;
-        if (s.streak >= statusStableReads) {
-          s.current = incoming as any;
-          s.candidate = null;
-          s.streak = 0;
-        }
-      } else {
-        s.candidate = incoming as any;
-        s.streak = 1;
-      }
-    } else {
-      s.candidate = null;
-      s.streak = 0;
-    }
-    r.status = s.current;
-  }
-
-  function parseAndIngest(ev: MessageEvent) {
-    if (paused) return;
-    try {
-      if (!ev?.data) return;
-      let obj: any = null;
-      try {
-        obj = JSON.parse(ev.data);
-      } catch {
-        if (debug) console.log("[SSE] non-JSON:", ev.data);
-        return;
-      }
-      if (debug) console.log("[SSE] payload:", obj);
-      updateRaw(obj);
-    } catch (e: any) {
-      setError(e?.message || "SSE parse error.");
-    }
-  }
-
-  // Fixed-interval sampler: pushes one smoothed point per sampleEveryMs
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (!streaming || paused) return;
-
-      const r = lastRawRef.current;
-      const e = emaRef.current;
-
-      // EMA: x = alpha*new + (1-alpha)*prev
-      const a = Math.max(0, Math.min(1, emaAlpha));
-      e.speed = a * r.speed + (1 - a) * e.speed;
-      e.count = a * r.count + (1 - a) * e.count;
-      e.pass = a * r.pass + (1 - a) * e.pass;
-      e.fail = a * r.fail + (1 - a) * e.fail;
-      e.suspect = a * r.suspect + (1 - a) * e.suspect;
-      e.packedFg = a * r.packedFg + (1 - a) * e.packedFg;
-
-      const t = r.ts || Date.now();
-      const point = {
-        t,
-        timeLabel: new Date(t).toLocaleTimeString([], { hour12: false }),
-        status: r.status,
-        speed: Math.round(e.speed),
-        count: Math.round(e.count),
-        pass: Math.round(e.pass),
-        fail: Math.round(e.fail),
-        suspect: Math.round(e.suspect),
-        packedFg: Math.round(e.packedFg),
-      };
-
-      setPoints((prev) => {
-        const next = [...prev, point];
-        if (next.length > maxPoints) next.splice(0, next.length - maxPoints);
-        return next;
-      });
-    }, sampleEveryMs);
-
-    return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [streaming, paused, sampleEveryMs, emaAlpha, maxPoints]);
-
-  const startStream = () => {
-    if (streaming || esRef.current) return;
-    setError(null);
-
-    const es = new EventSource(streamUrl, { withCredentials: false });
-    esRef.current = es;
-
-    // named events
-    es.addEventListener("telemetry", parseAndIngest);
-    es.addEventListener("tick", parseAndIngest);
-    es.addEventListener("data", parseAndIngest);
-    es.addEventListener("action", (ev) => debug && console.log("[SSE action]", ev.data));
-
-    // default event
-    es.onmessage = parseAndIngest;
-
-    es.onerror = () => setError("SSE connection error.");
-    es.onopen = () => setStreaming(true);
+  const flush = () => {
+    if (!pendingRef.current) return;
+    const s = pendingRef.current;
+    setPoints((prev) => {
+      const time = new Date(s.ts || Date.now()).toLocaleTimeString([], { hour12: false });
+      const next = [
+        ...prev,
+        {
+          t: s.ts,
+          timeLabel: time,
+          status: s.status,
+          // counters are NOT smoothed
+          count: s.count,
+          pass: s.pass,
+          fail: s.fail,
+          suspect: s.suspect,
+          packedFg: s.packedFg,
+          // speed is smoothed (for KPI if needed later)
+          speed: Math.round(s.speed),
+        },
+      ];
+      if (next.length > maxPoints) next.splice(0, next.length - maxPoints);
+      return next;
+    });
+    pendingRef.current = null;
   };
 
-  const stopStream = () => {
-    if (esRef.current) {
-      esRef.current.close();
-      esRef.current = null;
+  const scheduleFlush = () => {
+    if (throttleTimerRef.current != null) return;
+    throttleTimerRef.current = window.setTimeout(() => {
+      flush();
+      throttleTimerRef.current = null;
+    }, throttleMs);
+  };
+
+  const onTelemetry = (e: MessageEvent) => {
+    if (paused) return;
+    try {
+      const data: TelemetryEvent = JSON.parse(e.data);
+
+      // dedup by server timestamp if present
+      const ts = typeof data.ts === "string" ? data.ts : new Date().toISOString();
+      if (ts === lastTsRef.current) return;
+      lastTsRef.current = ts;
+
+      // counters come directly (no EMA)
+      const pass = toNum(data.pass, lastSnapRef.current.pass);
+      const fail = toNum(data.fail, lastSnapRef.current.fail);
+      const suspect = toNum(data.suspect, lastSnapRef.current.suspect);
+      const packedFg = toNum(data.packedFg, lastSnapRef.current.packedFg);
+      const count = toNum(data.count, lastSnapRef.current.count);
+
+      // speed: EMA only (avoid jitter)
+      const alpha = clamp01(speedEmaAlpha);
+      const speedRaw = toNum(data.speed, lastSnapRef.current.speed);
+      const speed = alpha * speedRaw + (1 - alpha) * lastSnapRef.current.speed;
+
+      const status = String(data.status ?? lastSnapRef.current.status ?? "IDLE");
+
+      const snapshot = {
+        ts,
+        status,
+        speed,
+        count,
+        pass,
+        fail,
+        suspect,
+        packedFg,
+      };
+
+      lastSnapRef.current = snapshot;
+      pendingRef.current = snapshot;
+      if (debug) console.log("[telemetry]", snapshot);
+      scheduleFlush();
+    } catch {
+      // ignore malformed message
     }
+  };
+
+  useEffect(() => {
+    if (!stationId) return;
+    setError(null);
+
+    const url = `${API_BASE}/api/stream/station/${encodeURIComponent(stationId)}`;
+    const es = new EventSource(url, { withCredentials: true });
+    esRef.current = es;
+
+    es.addEventListener("telemetry", onTelemetry);
+    es.addEventListener("ping", () => {}); // ignore keepalive
+    es.addEventListener("hello", () => {}); // ignore hello
+
+    es.onopen = () => setStreaming(true);
+    es.onerror = () => setError("SSE connection error");
+
+    return () => {
+      es.close();
+      esRef.current = null;
+      setStreaming(false);
+      if (throttleTimerRef.current) {
+        clearTimeout(throttleTimerRef.current);
+        throttleTimerRef.current = null;
+      }
+    };
+  }, [stationId]);
+
+  const stopStream = () => {
+    esRef.current?.close();
+    esRef.current = null;
     setStreaming(false);
+  };
+
+  const startStream = () => {
+    // simply re-run effect by changing key: force cleanup + reopen
+    stopStream();
+    lastTsRef.current = "";
+    lastSnapRef.current.ts = "";
+    // reopen by toggling a dummy state or instruct user to change station selection if needed
+    const url = `${API_BASE}/api/stream/station/${encodeURIComponent(stationId)}`;
+    const es = new EventSource(url, { withCredentials: true });
+    es.addEventListener("telemetry", onTelemetry);
+    es.addEventListener("ping", () => {});
+    es.addEventListener("hello", () => {});
+    es.onopen = () => setStreaming(true);
+    es.onerror = () => setError("SSE connection error");
+    esRef.current = es;
   };
 
   const togglePause = () => setPaused((p) => !p);
   const resetData = () => setPoints([]);
 
-  // restart when station changes
-  useEffect(() => {
-    if (streaming) {
-      stopStream();
-      const id = setTimeout(startStream, 150);
-      return () => clearTimeout(id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stationId]);
-
-  useEffect(() => () => stopStream(), []);
-
   const startSimulator = async () => {
     setError(null);
     try {
-      const r = await fetch(`${API_BASE}/api/sim/start/${encodeURIComponent(stationId)}`, { method: "POST" });
+      const r = await fetch(
+        `${API_BASE}/api/sim/start/${encodeURIComponent(stationId)}`,
+        { method: "POST" }
+      );
       if (!r.ok) throw new Error(`Simulator failed: ${r.status}`);
     } catch (e: any) {
       setError(e?.message || "Simulator error.");
@@ -245,30 +227,60 @@ export default function Live({
         <h2 style={{ margin: 0 }}>
           Live — Station: <span style={{ opacity: 0.85 }}>{stationId}</span>
         </h2>
-        <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 999, background: streaming ? "#1b5e20" : "#424242", color: "#fff" }}>
+        <span
+          style={{
+            fontSize: 12,
+            padding: "2px 8px",
+            borderRadius: 999,
+            background: streaming ? "#1b5e20" : "#424242",
+            color: "#fff",
+          }}
+        >
           {streaming ? (paused ? "PAUSED" : "STREAMING") : "STOPPED"}
         </span>
         <label style={{ marginLeft: 8, fontSize: 12 }}>
-          <input type="checkbox" checked={debug} onChange={(e) => setDebug(e.target.checked)} style={{ marginRight: 6 }} />
+          <input
+            type="checkbox"
+            checked={debug}
+            onChange={(e) => setDebug(e.target.checked)}
+            style={{ marginRight: 6 }}
+          />
           Debug logs
         </label>
         <small style={{ opacity: 0.6 }}>
-          sample={sampleEveryMs}ms • alpha={emaAlpha} • statusN={statusStableReads}
+          throttle={throttleMs}ms • speedEMA={speedEmaAlpha}
         </small>
       </header>
 
       <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
         {!streaming ? (
-          <button onClick={startStream} style={btn()}>Start Stream</button>
+          <button onClick={startStream} style={btn()}>
+            Start Stream
+          </button>
         ) : (
-          <button onClick={stopStream} style={btn()}>Stop Stream</button>
+          <button onClick={stopStream} style={btn()}>
+            Stop Stream
+          </button>
         )}
-        <button onClick={togglePause} disabled={!streaming} style={btn()}>{paused ? "Resume" : "Pause"}</button>
-        <button onClick={resetData} style={btn()}>Reset</button>
-        <button onClick={startSimulator} style={btn()}>Start Simulator</button>
+        <button onClick={togglePause} disabled={!streaming} style={btn()}>
+          {paused ? "Resume" : "Pause"}
+        </button>
+        <button onClick={resetData} style={btn()}>
+          Reset
+        </button>
+        <button onClick={startSimulator} style={btn()}>
+          Start Simulator
+        </button>
       </div>
 
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12, marginTop: 12 }}>
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, minmax(0,1fr))",
+          gap: 12,
+          marginTop: 12,
+        }}
+      >
         <Kpi title="Status" value={last?.status ?? "—"} />
         <Kpi title="Speed" value={last?.speed ?? 0} />
         <Kpi title="Count" value={last?.count ?? 0} />
@@ -294,7 +306,15 @@ export default function Live({
       </section>
 
       {error && (
-        <div style={{ marginTop: 12, padding: 8, border: "1px solid #b71c1c", color: "#ff8a80", borderRadius: 8 }}>
+        <div
+          style={{
+            marginTop: 12,
+            padding: 8,
+            border: "1px solid #b71c1c",
+            color: "#ff8a80",
+            borderRadius: 8,
+          }}
+        >
           {error}
         </div>
       )}
@@ -320,4 +340,14 @@ function btn(): React.CSSProperties {
     border: "1px solid #37474f",
     cursor: "pointer",
   };
+}
+
+function toNum(n: any, fallback = 0): number {
+  const v = Number(n);
+  return Number.isFinite(v) ? v : fallback;
+}
+
+function clamp01(x: number): number {
+  if (!Number.isFinite(x)) return 0;
+  return Math.max(0, Math.min(1, x));
 }

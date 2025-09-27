@@ -1,4 +1,5 @@
-﻿import "dotenv/config";
+﻿// src/server.ts
+import "dotenv/config";
 import express, { Response } from "express";
 import cors from "cors";
 import fs from "fs";
@@ -8,18 +9,19 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const app = express();
 
-// CORS for Vite dev server
+/* ------------------------------------------------------------------ */
+/* CORS / Body                                                         */
+/* ------------------------------------------------------------------ */
 app.use(
   cors({
     origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
     credentials: true,
   })
 );
-
 app.use(express.json({ limit: "1mb" }));
 
 /* ------------------------------------------------------------------ */
-/* Utilities                                                           */
+/* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 function readJSON<T = any>(rel: string): T {
   const p = path.join(process.cwd(), rel);
@@ -52,7 +54,7 @@ const STATIONS: Station[] = readJSON<Station[]>("seed/stations.json");
 const DEVICES: Device[] = readJSON<Device[]>("seed/devices.json");
 
 /* ------------------------------------------------------------------ */
-/* TimescaleDB bootstrap (optional, idempotent)                        */
+/* TimescaleDB bootstrap (idempotent)                                  */
 /* ------------------------------------------------------------------ */
 async function ensureTimescale() {
   try {
@@ -87,26 +89,21 @@ async function ensureTimescale() {
 /* ------------------------------------------------------------------ */
 const channels = new Map<string, Set<Response>>();
 
-function publish(stationId: string, data: unknown) {
-  const set = channels.get(stationId);
-  if (!set) return;
-  const payload = `data: ${JSON.stringify(data)}\n\n`;
-  for (const res of set) {
-    try {
-      res.write(payload);
-    } catch {
-      // ignore broken pipe
-    }
-  }
-}
-
 function openSSE(res: Response, stationId: string) {
   res.set({
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     Connection: "keep-alive",
   });
-  (res as any).flushHeaders?.();
+  
+   res.set({
+  "Content-Type": "text/event-stream",
+  "Cache-Control": "no-cache",
+  Connection: "keep-alive",
+});
+(res as any).flushHeaders?.();
+
+
 
   let set = channels.get(stationId);
   if (!set) {
@@ -115,7 +112,9 @@ function openSSE(res: Response, stationId: string) {
   }
   set.add(res);
 
-  res.write(`event: hello\ndata: {"stationId":"${stationId}"}\n\n`);
+  // initial hello + keep-alive pings
+  res.write(`event: hello\n`);
+  res.write(`data: {"stationId":"${stationId}"}\n\n`);
   const iv = setInterval(() => res.write(":\n\n"), 15000);
 
   res.req.on("close", () => {
@@ -126,6 +125,20 @@ function openSSE(res: Response, stationId: string) {
   });
 
   console.log("[SSE] open", stationId);
+}
+
+function sseBroadcast(stationId: string, event: string, payload: any) {
+  const set = channels.get(stationId);
+  if (!set) return;
+  const data = typeof payload === "string" ? payload : JSON.stringify(payload);
+  for (const res of set) {
+    try {
+      res.write(`event: ${event}\n`);
+      res.write(`data: ${data}\n\n`);
+    } catch {
+      // ignore broken pipe
+    }
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -165,13 +178,13 @@ app.get("/api/inventory", (_req, res) => {
 /* ------------------------------------------------------------------ */
 /* SSE endpoints                                                       */
 /* ------------------------------------------------------------------ */
-/** New endpoint (query): /api/sse?stationId=... */
+/** Query-style endpoint: /api/sse?stationId=... */
 app.get("/api/sse", (req, res) => {
   const stationId = String(req.query.stationId ?? "unknown");
   openSSE(res, stationId);
 });
 
-/** Back-compat alias expected by FE: /api/stream/station/:id */
+/** Back-compat alias: /api/stream/station/:id */
 app.get("/api/stream/station/:id", (req, res) => {
   const stationId = String(req.params.id);
   openSSE(res, stationId);
@@ -183,7 +196,7 @@ app.get("/api/stream/station/:id", (req, res) => {
 app.post("/api/telemetry", async (req, res) => {
   try {
     const body = req.body ?? {};
-    const stationId = String(body.stationId ?? "");
+    const stationId = String(body.stationId ?? "").trim();
     const deviceId =
       body.deviceId == null ? null : String(body.deviceId ?? "").trim() || null;
     if (!stationId) return res.status(400).json({ error: "stationId required" });
@@ -226,18 +239,24 @@ app.post("/api/telemetry", async (req, res) => {
 
     await prisma.telemetry.createMany({ data: rows });
 
-    // Minimal live fan-out: group a few known keys if present
-    const snapshot: Record<string, number> = {};
+    // Build a snapshot for the live UI
+    const snapshot: Record<string, number | string> = { stationId, ts: new Date().toISOString() };
     for (const r of rows) {
-      if (r.k === "pass" || r.k === "fail" || r.k === "suspect" || r.k === "packedFg") {
-        if (typeof r.v === "number") snapshot[r.k] = r.v;
+      if (
+        r.k === "status" ||
+        r.k === "speed" ||
+        r.k === "count" ||
+        r.k === "pass" ||
+        r.k === "fail" ||
+        r.k === "suspect" ||
+        r.k === "packedFg"
+      ) {
+        if (r.v != null) snapshot[r.k] = r.v;
       }
     }
-    publish(stationId, {
-      stationId,
-      ts: new Date().toISOString(),
-      ...snapshot,
-    });
+
+    // Fan-out as SSE event
+    sseBroadcast(stationId, "telemetry", snapshot);
 
     return res.status(201).json({ ok: true, inserted: rows.length });
   } catch (err) {
@@ -247,7 +266,7 @@ app.post("/api/telemetry", async (req, res) => {
 });
 
 /* ------------------------------------------------------------------ */
-/* Simple simulator (back-compat for FE button)                        */
+/* Simple simulator (for demo)                                         */
 /* ------------------------------------------------------------------ */
 app.post("/api/sim/start/:id", async (req, res) => {
   const stationId = String(req.params.id);
@@ -256,18 +275,26 @@ app.post("/api/sim/start/:id", async (req, res) => {
     let pass = 12,
       fail = 1,
       suspect = 0,
-      packedFg = 13;
+      packedFg = 13,
+      speed = 48,
+      count = pass + fail + suspect;
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
       const now = new Date();
 
+      // simple random walk
       pass += Math.random() < 0.7 ? 1 : 0;
-      fail += Math.random() < 0.1 ? 1 : 0;
+      fail += Math.random() < 0.12 ? 1 : 0;
       suspect += Math.random() < 0.15 ? 1 : 0;
-      packedFg = Math.max(packedFg, pass + fail + suspect);
+      speed = Math.max(20, Math.min(60, speed + (Math.random() < 0.5 ? -1 : 1)));
+      count = pass + fail + suspect;
+      packedFg = Math.max(packedFg, count);
 
       await prisma.telemetry.createMany({
         data: [
+          { time: now, stationId, k: "status", v: null }, // status is string; stored separately if needed
+          { time: now, stationId, k: "speed", v: speed },
+          { time: now, stationId, k: "count", v: count },
           { time: now, stationId, k: "pass", v: pass },
           { time: now, stationId, k: "fail", v: fail },
           { time: now, stationId, k: "suspect", v: suspect },
@@ -275,10 +302,13 @@ app.post("/api/sim/start/:id", async (req, res) => {
         ],
       });
 
-      publish(stationId, {
+      // live update for UI
+      sseBroadcast(stationId, "telemetry", {
         stationId,
         ts: new Date().toISOString(),
         status: "RUNNING",
+        speed,
+        count,
         pass,
         fail,
         suspect,

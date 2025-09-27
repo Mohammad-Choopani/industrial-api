@@ -341,3 +341,50 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
     }
   });
 }
+/* ------------------------------------------------------------------ */
+/* Telemetry: GET history (bucketed in-memory)                         */
+/* ------------------------------------------------------------------ */
+app.get("/api/telemetry/:stationId", async (req, res) => {
+  try {
+    const stationId = String(req.params.stationId || "").trim();
+    if (!stationId) return res.status(400).json({ error: "stationId required" });
+
+    const minutes = Math.max(1, Math.min(1440, Number(req.query.minutes ?? 60)));
+    const bucketSec = Math.max(1, Math.min(3600, Number(req.query.bucket ?? 60)));
+
+    const now = new Date();
+    const from = new Date(now.getTime() - minutes * 60_000);
+
+    // Pull recent rows and bucket in Node (keeps it simple & Prisma-only)
+    const rows = await prisma.telemetry.findMany({
+      where: { stationId, time: { gte: from } },
+      select: { time: true, k: true, v: true },
+      orderBy: { time: "asc" },
+    });
+
+    const bucketMs = bucketSec * 1000;
+    const groups = new Map<number, Record<string, any>>();
+
+    for (const r of rows) {
+      const t = Math.floor(new Date(r.time).getTime() / bucketMs) * bucketMs;
+      const g = groups.get(t) ?? { ts: new Date(t).toISOString() };
+      if (r.v !== null) g[r.k] = r.v; // keep latest value per key within the bucket
+      groups.set(t, g);
+    }
+
+    const points = Array.from(groups.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([, g]) => g);
+
+    res.json({
+      stationId,
+      from: from.toISOString(),
+      to: now.toISOString(),
+      bucket: bucketSec,
+      points,
+    });
+  } catch (e) {
+    console.error("GET /api/telemetry error", e);
+    res.status(500).json({ error: "query failed" });
+  }
+});
